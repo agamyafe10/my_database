@@ -14,13 +14,12 @@ class my_ui:
         self.my_db = DATA_BASE(path, file_name)# the database object
         
 
-    def run_base(self):
+    def run_base(self, res=""):
         res = ""
         curr_dict = {}
         while res != 'q':
-            res = input("HEY \n WELCOME TO YPUR PRIVATE DATABASE \n WOUKD YOU LIKE TO READ/UPDATE/EXIT - (1/2/q)")
+            res = input("HEY \n WELCOME TO YPUR PRIVATE DATABASE \n WOUKD YOU LIKE TO READ/UPDATE/EXIT - (1/2/q)    ")
             if res != 'q':
-                
                 if res == '1':# the user hasa asked to read the file
                     if not my_ui.my_lock.locked():# if nobody updates
                         my_ui.my_sema.acquire()
@@ -28,15 +27,17 @@ class my_ui:
                         print(curr_dict)
                         my_ui.my_sema.release()
                 if res == '2':
-                    if not my_ui.my_lock.locked() and  my_ui.my_sema.get_value == 0:# if nobody updates
+                    if not my_ui.my_lock.locked() and  my_ui.my_sema._value == 10:# if nobody updates
                         my_ui.my_lock.acquire()
                         curr_dict = self.my_db.read_file()
-                        print(curr_dict)
+                        print(curr_dict)    
                         new_dict = {}
                         print("Enter key:value and <ENTER>, when finished press <e> ")
-                        while client_input != 'e':
+                        dict_part = ""
+                        while dict_part != ['e']:
                             dict_part = input().split(":")
-                            new_dict[dict_part[0]] = dict_part[1]
-                            client_input = input()
+                            if len(dict_part) == 2:
+                                new_dict[dict_part[0]] = dict_part[1]
                         self.my_db.update_file(new_dict)
-                    
+                        my_ui.my_lock.release()
+    
