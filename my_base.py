@@ -2,7 +2,7 @@ import threading
 import pickle
 
 
-def conv_to_file(dicti, file_na
+def conv_to_file(dicti, file_name):
     """recieves a dictionary and write it binary into a file"""
     dict_file = open(file_name, "wb")
     pickle.dump(dicti, dict_file)
