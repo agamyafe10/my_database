@@ -8,13 +8,13 @@ from client_ui import *
 # deafault settings
 SERVER_IP = '127.0.0.1'
 SERVER_PORT = 5678
-
+READERS = 0
 
 server_socket = setup_socket(SERVER_IP, SERVER_PORT)
 open_client_sockets = []  # the sockets which currently connected to the server
 
 my_lock = threading.Lock()# 
-maxThreads = 10 # the maximum number of readers allowed
+maxThreads = 2 # the maximum number of readers allowed
 my_sema = threading.BoundedSemaphore(maxThreads)
 my_db = DATA_BASE("", "test1")# creating the database
 flag = False
@@ -32,7 +32,7 @@ while not flag:
                 print("[Client Disconnected Surprisingly]")
                 open_client_sockets.remove(current_socket)
                 continue
-            if client_request == "1" and not my_lock.locked():# clients wants to read 
+            if client_request == "1" and not my_lock.locked():# clients wants to read  
                 my_sema.acquire()
                 send_value(current_socket, dict_to_str(my_db.read_file()))
                 my_sema.release()
