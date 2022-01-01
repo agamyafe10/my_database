@@ -18,18 +18,12 @@ def recv_msg(conn):
     """recieves a socket and returns the data recieved as a string
     """
     try:
-        data = conn.recv(2048).decode()
-        print("Server Response: " + data)
+        data = conn.recv(4096).decode()
+        print("Response: " + data)
         return data
     except:
         print("ERROR WHILE GETTING CLIENT'S REQUEST")
 
-
-def send_range(conn, dict):
-	"""uses the global variable rANGE_NUM in oreder to send the range to the client
-	"""
-
-	conn.send((from_num + '-' + to_num + '-' + TARGET).encode())
 
 
 def dict_to_str(my_dict):

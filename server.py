@@ -3,18 +3,17 @@ import time
 import socket
 import select
 from server_help_funcs import *
-from client_ui import *
+from my_base import *
 
 # deafault settings
 SERVER_IP = '127.0.0.1'
 SERVER_PORT = 5678
-READERS = 0
 
 server_socket = setup_socket(SERVER_IP, SERVER_PORT)
 open_client_sockets = []  # the sockets which currently connected to the server
 
 my_lock = threading.Lock()# 
-maxThreads = 2 # the maximum number of readers allowed
+maxThreads = 10 # the maximum number of readers allowed
 my_sema = threading.BoundedSemaphore(maxThreads)
 my_db = DATA_BASE("", "test1")# creating the database
 flag = False
@@ -28,15 +27,17 @@ while not flag:
             open_client_sockets.append(new_socket)
         else:
             client_request = recv_msg(current_socket)# recieves the client request
-            if client_request is None:# clients diconnects 
-                print("[Client Disconnected Surprisingly]")
+            if client_request is None or client_request == 'q':# clients diconnects 
+                print("[Client Disconnected]!")
                 open_client_sockets.remove(current_socket)
                 continue
-            if client_request == "1" and not my_lock.locked():# clients wants to read  
+            elif client_request == '1' and not my_lock.locked():# clients wants to read  
                 my_sema.acquire()
-                send_value(current_socket, dict_to_str(my_db.read_file()))
+                dicti = dict_to_str(my_db.read_file())
+                print(dicti)
+                send_value(current_socket, dicti)
                 my_sema.release()
-            elif client_request == "2":# clients want to update
+            elif client_request == '2':# clients want to update
                 if my_sema._value == 10:# if nobody reads
                     my_lock.acquire()
                     send_value(current_socket, dict_to_str(my_db.read_file()))# sends the current dictionary

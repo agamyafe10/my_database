@@ -27,21 +27,29 @@ def main():
         res = input("HEY \n WELCOME TO YPUR PRIVATE DATABASE \n WOUKD YOU LIKE TO READ/UPDATE/EXIT - (1/2/q)    ")
         if res != 'q':
             if res == '1':# the user hasa asked to read the file
-                conn_sock.send("1".encode())
-                print(recv_msg(conn_sock))
-            if res == '2':
-                conn_sock.send("2".encode())
-                print(recv_msg(conn_sock))    
-                new_dict = {}
-                print("Enter key:value and <ENTER>, when finished press <e> ")
-                dict_part = ""
-                while dict_part != ['e']:
-                    dict_part = input().split(":")
-                    if len(dict_part) == 2:
-                        new_dict[dict_part[0]] = dict_part[1]
-                conn_sock.send(dict_to_str(new_dict).encode())
-                print(recv_msg(conn_sock))
+                send_value(conn_sock, '1')
+                recv_msg(conn_sock)
+            elif res == '2':
+                send_value(conn_sock, '2')
+                old_dict = str_to_dict(recv_msg(conn_sock)) 
+
+                c_res = ""
+                while c_res != 'e':
+                    c_res = input("would you like to add or update/ delete/finish (a/b/e)- ")
+                    if c_res == 'a': #client wants to update or delete
+                        dict_part = input("enter the key and the value you want to add or update like this (key:value)- ").split(":")
+                        old_dict[dict_part[0]] = dict_part[1]
+                    elif c_res == 'b':
+                        dict_part = input("enter the key and the value you want to remove")
+                        try:
+                            old_dict.pop(dict_part)
+                        except:
+                            print("NONE EXISTED KEY WAS ENTERD PLEASE TRY AGAIN")
+                send_value(conn_sock, dict_to_str(old_dict))
+                recv_msg(conn_sock)
     
+    send_value(conn_sock, 'q')
+
 
 if __name__ == '__main__':
     main()
